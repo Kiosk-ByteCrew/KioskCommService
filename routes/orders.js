@@ -2,9 +2,13 @@ const express = require('express');
 const router = express.Router();
 const ordersController = require('../controllers/ordersController');
 
-// GET /api/orders/test
-router.get('/', ordersController.getTestOrders);
-
+// GET /api/orders/{orderId}
+router.get('/:orderId', ordersController.getOrder);
 // Future Order-related routes will be added here.
+
+// POST /api/orders/place
+router.post("/place", ordersController.createOrder);
+
+
 
 module.exports = router;
