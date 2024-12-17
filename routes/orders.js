@@ -9,6 +9,9 @@ router.get('/:orderId', ordersController.getOrder);
 // POST /api/orders/place
 router.post("/place", ordersController.createOrder);
 
+// POST /api/orders/pastOrders
+router.post("/pastOrders", ordersController.getOrders);
+
 
 
 module.exports = router;
