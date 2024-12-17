@@ -2,6 +2,7 @@ const express = require('express');
 const morgan = require('morgan');
 const ordersRouter = require('./routes/orders');
 const usersRouter = require('./routes/users');
+const conversationRouter = require('./routes/conversation')
 const logger = require('./utils/logger');
 
 const app = express();
@@ -14,6 +15,7 @@ app.use(morgan('combined', { stream: logger.stream }));
 // Routes
 apiRouter.use('/orders', ordersRouter);
 apiRouter.use('/users', usersRouter);
+apiRouter.use('/conversation', conversationRouter)
 
 // Health Check Endpoint
 app.get('/health', (req, res) => {
@@ -23,13 +25,10 @@ app.get('/health', (req, res) => {
 
 // Mount apiRouter under /kiosk-comm/api
 app.use('/kiosk-comm/api', apiRouter);
-
-// 404 Handler
 app.use((req, res, next) => {
   res.status(404).json({ error: 'Not Found' });
 });
 
-// Global Error Handler
 app.use((err, req, res, next) => {
   logger.error(err.stack);
   res.status(500).json({ error: 'Something went wrong!' });
