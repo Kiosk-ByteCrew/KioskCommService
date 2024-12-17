@@ -1,5 +1,6 @@
 const conversationService = require('../services/conversationsService');
 const logger = require('../utils/logger');
+const fs = require('fs');
 
 function validate(userId, status) {
     const allowedStatuses = ['active', 'pending', 'closed'];
@@ -55,24 +56,40 @@ exports.getAllConversationMetadatas = async (req, res) => {
 
 exports.makeConversation = async (req, res) => {
     try {
-        const {
-            user_id,
-            messages,
-            parent_message_id
-        } = req.body;
-
-        if (!user_id) {
-            throw new Error('user_id is required and must be a string.');
+        const { session_id, message, start_conversation } = req.body;
+        if (!session_id) {
+            return res.status(400).json({
+                message: 'session_id is required and cannot be empty.'
+            });
         }
-        const llmConversation = await conversationService.makeConversation({user_id, messages, parent_message_id})
+
+        if (!req.file) {
+            return res.status(400).json({
+                message: 'Audio file is required.'
+            });
+        }
+        const filePath = req.file.path;
+        const transcription = await conversationService.transcribeAudio(filePath);
+        console.log(transcription)
+        fs.unlink(filePath, (err) => {
+            if (err) {
+                console.error('Error deleting file:', err);
+            }
+        });
+        const llmConversation = await conversationService.makeConversation({
+            session_id,
+            transcription,
+            start_conversation
+        });
+
         res.status(201).json({
-            message: 'Got response from LLM.',
+            promptMessage: transcription,
             data: llmConversation
         });
     } catch (error) {
-        logger.error("Error while getting response from llm", { error });
+        console.error("Error while processing conversation:", error);
         res.status(500).json({
-            message: "Failed to fetch response",
+            message: "Failed to process conversation",
             error: error.message
         });
     }
