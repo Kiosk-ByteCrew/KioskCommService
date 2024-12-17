@@ -9,10 +9,10 @@ const axiosInstance = axios.create({
     headers: { 'Content-Type': 'application/json' }
 });
 
-exports.createOrder = async ({ userId, restaurantId, tenantId, itemDetails, status }) => {
+exports.createOrder = async ({ userName, restaurantId, tenantId, itemDetails, status }) => {
     try {
         const newOrder = {
-            userId,
+            userName,
             restaurantId,
             tenantId,
             itemDetails,

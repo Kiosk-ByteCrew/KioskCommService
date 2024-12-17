@@ -1,4 +1,5 @@
 const ordersService = require('../services/ordersService');
+const usersService = require('../services/usersService')
 const logger = require('../utils/logger');
 
 exports.getOrder = async (req, res) => {
@@ -11,19 +12,29 @@ exports.getOrder = async (req, res) => {
     });
 };
 
-function validateRequest(userId, restaurantId, tenantId, itemDetails) {
-    if (!userId || !restaurantId || !tenantId || !Array.isArray(itemDetails) || itemDetails.length === 0) {
-        throw new Error('Invalid request body. Please check userId, restaurantId, tenantId, and itemDetails.');
+exports.getOrders = async (req, res) => {
+    const { userId, userName } = req.body;
+    const orders = await usersService.getAllOrders(userId, userName);
+    res.status(200).json({
+        message: 'Order fetched successfully',
+        data: orders
+    });
+};
+
+function validateRequest(userName, restaurantId, tenantId, itemDetails) {
+    if (!userName || !restaurantId || !tenantId || !Array.isArray(itemDetails) || itemDetails.length === 0) {
+        throw new Error('Invalid request body. Please check userName, restaurantId, tenantId, and itemDetails.');
     }
 }
 
 exports.createOrder = async (req, res) => {
     try {
         logger.info('Placing the order', { body: req.body });
-        const { userId, restaurantId, tenantId, itemDetails, status } = req.body;
-        validateRequest(userId, restaurantId, tenantId, itemDetails);
+        const { userName, restaurantId, tenantId, itemDetails, status } = req.body;
+        validateRequest(userName, restaurantId, tenantId, itemDetails);
+        console.log("username here will be ", userName)
         const newOrder = await ordersService.createOrder({
-            userId,
+            userName,
             restaurantId,
             tenantId,
             itemDetails,

@@ -31,3 +31,16 @@ exports.createUser = async (userData) => {
         throw new Error("Failed to create user. Try again.");
     }
 };
+
+
+exports.getAllOrders = async (userId, userName) => {
+    const payload = {
+        userId,
+        userName
+    };
+    const response = await axiosInstance.post('/pastOrders', payload);
+    if (response.status !== 201 && response.status !== 200) {
+        throw new Error("Failed to create order at Kiosk App.");
+    }
+    return response.data;
+};
